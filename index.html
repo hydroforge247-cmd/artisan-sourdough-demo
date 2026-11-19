@@ -6,6 +6,7 @@
 <title>The Artisan Sourdough Bakery &amp; Café · Parys</title>
 <meta name="description" content="Naturally fermented sourdough, wood-fired pizza and a garden café at 8 Kruis Street, Parys. Order bread on WhatsApp.">
 <meta name="theme-color" content="#fbf6ec">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%8D%9E%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -82,7 +83,14 @@ h2.big{font-size:clamp(34px,7vw,56px);margin:12px 0 14px}
 .rise{opacity:0;transform:translateY(16px);animation:rise .9s cubic-bezier(.2,.7,.2,1) forwards}.d1{animation-delay:.12s}.d2{animation-delay:.24s}.d3{animation-delay:.36s}
 @keyframes rise{to{opacity:1;transform:none}}
 /* quick cards */
-.quick{margin-top:-34px;position:relative;z-index:3}
+.quick{margin-top:24px;position:relative;z-index:3}
+/* wide screens: the opening takes the film's exact 16:9 shape, so the film is never cropped or blown up */
+@media (orientation:landscape) and (min-width:701px){.hero{height:56.25vw;min-height:560px}}
+.sm{display:none}
+@media(max-width:700px){.lg{display:none}.sm{display:inline}.quick{margin-top:18px}.hero .badge,.hero .lede{display:none}.hero h1{margin-top:0}}
+/* autoplay blocked (battery saver, low-power mode): a play button on the first scene; any touch starts the film too */
+.playFilm{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);z-index:4;width:84px;height:84px;border-radius:50%;border:2px solid rgba(255,255,255,.8);background:rgba(20,12,6,.45);backdrop-filter:blur(8px);color:#fff;font-size:30px;cursor:pointer;display:none}
+.playFilm.show{display:grid;place-items:center}
 .quick .wrap{display:grid;gap:12px}
 @media(min-width:800px){.quick .wrap{grid-template-columns:repeat(3,1fr)}}
 .qc{background:#fff;border-radius:18px;padding:18px 20px;box-shadow:0 18px 40px -22px rgba(60,35,15,.45);display:flex;gap:14px;align-items:center;text-decoration:none;color:var(--ink);border:1px solid var(--line)}
@@ -130,7 +138,8 @@ h2.big{font-size:clamp(34px,7vw,56px);margin:12px 0 14px}
 .oven .eyebrow{color:#ffc58f}.oven p{color:#f1e2cf}
 #ovenWrap{position:relative;height:min(100vw,560px);min-height:400px;border-radius:var(--r);overflow:hidden;cursor:grab;touch-action:pan-y;background:rgba(0,0,0,.15)}
 #ovenWrap canvas{display:block;width:100%;height:100%}
-.ovenFallback{position:absolute;inset:0;object-fit:cover;width:100%;height:100%}
+.ovenFallback{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(50% 45% at 50% 60%,rgba(255,140,50,.45),rgba(60,25,8,.2) 60%,transparent 80%);color:#ffd9b0;font-weight:600;letter-spacing:.04em}
+.ovenFallback span{animation:glowp 1.6s ease-in-out infinite alternate}@keyframes glowp{from{opacity:.45}to{opacity:1}}
 [hidden]{display:none!important}
 .ovenUi{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;align-items:center;z-index:2;padding:14px 12px;pointer-events:none}
 .ovenUi>*{pointer-events:auto}
@@ -139,7 +148,8 @@ h2.big{font-size:clamp(34px,7vw,56px);margin:12px 0 14px}
 .gbtns{display:flex;gap:8px}
 .pchoices{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
 .pchoices button{min-height:38px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:rgba(20,10,4,.55);color:#ffe9cf;font:600 13.5px Inter,sans-serif;cursor:pointer;backdrop-filter:blur(6px)}
-.pchoices button[aria-checked="true"]{background:#ffd08a;color:#2b1406;border-color:#ffd08a}.gbtns [hidden]{display:none}
+.pchoices button[aria-checked="true"]{background:#ffd08a;color:#2b1406;border-color:#ffd08a}
+@media(max-width:700px){.pchoices{position:absolute;top:58px;left:12px;right:12px}.pchoices button{min-height:34px;font-size:13px;padding:0 10px}}.gbtns [hidden]{display:none}
 .stoke2{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.35);min-height:46px;padding:0 16px;font-size:15.5px}
 .stoke{background:rgba(255,140,60,.92);color:#2b1406;min-height:46px;padding:0 18px;font-size:15.5px}
 .hint{font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,230,205,.85)}
@@ -220,7 +230,7 @@ details summary{cursor:pointer;color:#f1dfc2;min-height:32px}
 </svg>
 
 <header class="top" id="top">
-  <div class="pitch">A preview made for The Artisan Sourdough Bread Co. by <b>NFC Software Solutions</b><span class="long">, using their own menu, photos and posts (the opening scenes are AI-made)</span>.</div>
+  <div class="pitch"><span class="lg">A preview made for The Artisan Sourdough Bread Co. by </span><span class="sm">Website preview by </span><b>NFC Software Solutions</b><span class="long">, using their own menu, photos and posts (the opening scenes are AI-made)</span>.</div>
   <div class="wrap">
     <a class="brand" href="#home" aria-label="The Artisan Sourdough Bakery and Café, home"><svg aria-hidden="true"><use href="#stampLogo"/></svg><span><b>The Artisan<br>Sourdough</b><small>Bakery &amp; Café · Parys</small></span></a>
     <nav class="nav" aria-label="Main"><a href="#menu">Menu</a><a href="#oven">Pizza</a><a href="#story">Our bread</a><a href="#house">The house</a><a href="#visit">Visit</a></nav>
@@ -235,6 +245,7 @@ details summary{cursor:pointer;color:#f1dfc2;min-height:32px}
   <video class="film" muted playsinline preload="auto" aria-hidden="true" data-land="media/film2.mp4" data-port="media/film2p.mp4"></video>
   <img class="film still" src="media/scene3.webp" alt="" aria-hidden="true">
   <p class="cap" id="cap" aria-hidden="true"></p>
+  <button type="button" class="playFilm" id="playFilm" aria-label="Play the film">▶</button>
   <div class="wrap heroText" id="heroText">
     <span class="badge rise"><i class="dot" id="openDot"></i><span id="openTxt">Open Sunday to Friday</span></span>
     <h1 class="rise d1">Real sourdough,<br><em>slowly</em> made in Parys.</h1>
@@ -246,9 +257,9 @@ details summary{cursor:pointer;color:#f1dfc2;min-height:32px}
   </div>
   <div class="wrap chapWrap">
     <div class="chapters" role="group" aria-label="Choose a scene">
-      <button type="button" class="chap on" data-i="0"><i></i><b>Fired by wood</b></button>
-      <button type="button" class="chap" data-i="1"><i></i><b>Shaped by hand</b></button>
-      <button type="button" class="chap" data-i="2"><i></i><b>Baked with time</b></button>
+      <button type="button" class="chap on" data-i="0"><i></i><b><span class="lg">Fired by wood</span><span class="sm">🔥 Fire</span></b></button>
+      <button type="button" class="chap" data-i="1"><i></i><b><span class="lg">Shaped by hand</span><span class="sm">🤲 Dough</span></b></button>
+      <button type="button" class="chap" data-i="2"><i></i><b><span class="lg">Baked with time</span><span class="sm">🍞 Bread</span></b></button>
     </div>
   </div>
 </section>
@@ -365,7 +376,7 @@ details summary{cursor:pointer;color:#f1dfc2;min-height:32px}
       <a class="btn btn-wa" href="https://wa.me/27712559726?text=Hi!%20Please%20send%20me%20the%20pizza%20menu%20%F0%9F%8D%95" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#wa"/></svg>Get the pizza menu</a>
     </div>
     <div id="ovenWrap" class="reveal" aria-label="A 3D wood-fired oven you can turn">
-      <img class="ovenFallback" src="media/p064.webp" alt="Flames inside the bakery's wood-fired brick oven" loading="lazy">
+      <div class="ovenFallback" aria-hidden="true"><span>Lighting the oven…</span></div>
       <div class="ovenUi"><span class="gmsg" id="gameMsg" role="status" aria-live="polite">Drag to turn the oven</span>
         <div class="gbottom"><div class="pchoices" id="pizzaPick" role="radiogroup" aria-label="Choose your pizza">
           <button type="button" role="radio" aria-checked="true" data-p="margherita">Margherita</button><button type="button" role="radio" aria-checked="false" data-p="pepperoni">Pepperoni</button><button type="button" role="radio" aria-checked="false" data-p="veggie">Veggie</button><button type="button" role="radio" aria-checked="false" data-p="biltong">Biltong &amp; Feta</button></div>
@@ -498,12 +509,17 @@ details summary{cursor:pointer;color:#f1dfc2;min-height:32px}
     chaps.forEach((c,k)=>{c.classList.toggle('on',k===i);c.querySelector('i').style.width='0';});
     heroText.classList.toggle('on',i===films.length-1);
     cur=i;const f=films[i];
-    if(f.tagName==='VIDEO'){f.currentTime=0;const p=f.play();if(p&&p.catch)p.catch(()=>show(films.length-1));}   // a phone that blocks autoplay goes straight to the title
+    if(f.tagName==='VIDEO'){f.currentTime=0;const p=f.play();if(p&&p.catch)p.catch(()=>blocked());}
     else{stillStart=performance.now();
       const tick=()=>{if(cur!==i)return;const p=Math.min(1,(performance.now()-stillStart)/STILL_MS);chaps[i].querySelector('i').style.width=p*100+'%';if(p<1)requestAnimationFrame(tick);};requestAnimationFrame(tick);}};
   films.forEach((f,k)=>{if(f.tagName!=='VIDEO')return;
     f.addEventListener('ended',()=>{if(k===cur)show(k+1);});
     f.addEventListener('timeupdate',()=>{if(k!==cur||!f.duration)return;chaps[k].querySelector('i').style.width=(f.currentTime/f.duration*100)+'%';setCap(k,f.currentTime);});});
+  // autoplay blocked: keep the first scene, show a play button; the first touch or click anywhere starts the film
+  const playBtn=document.getElementById('playFilm');let waiting=false;
+  function blocked(){if(waiting)return;waiting=true;playBtn.classList.add('show');
+    const go=()=>{if(!waiting)return;waiting=false;playBtn.classList.remove('show');removeEventListener('touchstart',go);removeEventListener('pointerdown',go);show(cur);};
+    playBtn.onclick=go;addEventListener('touchstart',go,{once:true,passive:true});addEventListener('pointerdown',go,{once:true});}
   chaps.forEach((c,k)=>c.onclick=()=>show(k));
   if(matchMedia('(prefers-reduced-motion: reduce)').matches)show(films.length-1);else show(0);
   // menu tabs (arrow keys move between them)
@@ -617,7 +633,7 @@ async function build(){
   el.addEventListener('pointerdown',e=>{drag={x:e.clientX,y0:target};el.setPointerCapture(e.pointerId);wrap.style.cursor='grabbing';});
   el.addEventListener('pointermove',e=>{if(drag)target=drag.y0-(e.clientX-drag.x)*.008;});
   const up=()=>{drag=null;wrap.style.cursor='grab';};el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
-  const fb=wrap.querySelector('.ovenFallback');fb.style.transition='opacity .8s';fb.style.opacity=0;setTimeout(()=>fb.remove(),900);
+  const fb=wrap.querySelector('.ovenFallback');if(fb){fb.style.transition='opacity .8s';fb.style.opacity=0;setTimeout(()=>fb.remove(),900);}
 
   let visible=true,raf=0;
   new IntersectionObserver(es=>{visible=es[0].isIntersecting;if(visible&&!raf)loop();},{}).observe(wrap);
@@ -679,7 +695,7 @@ async function build(){
       crustMats.forEach(m => m.color.copy(RAW).lerp(DONE, k).lerp(BURNT, b));
       cheeseMats.forEach(m => m.color.copy(CHEESE_RAW).lerp(CHEESE_DONE, k).lerp(CHEESE_BURNT, b));
     };
-    const reset = () => { state = 'idle'; done = 0; paint(); wedges.forEach(w => w.visible = true); gPeel.visible = false; gPeel.position.copy(OUT); cta.hidden = true; say('Drag to turn the oven', '🍕 Put in a pizza'); };
+    const reset = () => { state = 'idle'; done = 0; paint(); wedges.forEach(w => w.visible = true); gPeel.visible = true; gPeel.position.copy(OUT); cta.hidden = true; say('Drag to turn the oven', '🍕 Put in a pizza'); };
     btn.onclick = () => {
       const now = clock.getElapsedTime();
       if (state === 'idle') { state = 'in'; t0 = now; gPeel.visible = true; target = .12; say('Into the fire…', '', false); }
