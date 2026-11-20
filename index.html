@@ -159,6 +159,9 @@ h2.big{font-size:clamp(34px,7vw,56px);margin:12px 0 14px}
 @media(max-width:700px){.pchoices{position:absolute;top:58px;left:12px;right:12px}.pchoices button{min-height:34px;font-size:13px;padding:0 10px}}.gbtns [hidden]{display:none}
 .stoke2{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.35);min-height:46px;padding:0 16px;font-size:15.5px}
 .stoke{background:rgba(255,140,60,.92);color:#2b1406;min-height:46px;padding:0 18px;font-size:15.5px}
+#gameMsg.meter{background:linear-gradient(90deg,rgba(255,150,60,.75) var(--bake,0%),rgba(20,10,4,.6) var(--bake,0%))}
+.stoke2.nudge{background:rgba(255,140,60,.92);color:#2b1406;border-color:transparent;animation:nudgeP 1s ease-in-out infinite}
+@keyframes nudgeP{50%{box-shadow:0 0 0 7px rgba(255,150,60,.28),0 0 26px rgba(255,140,60,.55)}}
 .hint{font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,230,205,.85)}
 .facts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:22px 0}
 .facts div{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:13px 14px;font-size:15px}
@@ -171,6 +174,11 @@ h2.big{font-size:clamp(34px,7vw,56px);margin:12px 0 14px}
 .stamp{position:absolute;right:14px;top:14px;width:110px;height:110px;filter:drop-shadow(0 8px 18px rgba(0,0,0,.3))}
 .steps{display:grid;gap:12px;margin:22px 0 26px;counter-reset:s}
 .story>*,.split>*,.foch>*{min-width:0}   /* grid columns must not grow to fit a sideways swipe row */
+/* last sections: never wider than the phone, even with larger system text (long email, hours, map) */
+#visit,#visit *,footer,footer *{min-width:0;max-width:100%;overflow-wrap:anywhere}
+#visit iframe{width:100%}
+html,body{overflow-x:clip}
+@media(max-width:700px){#visit .wrap,footer .wrap{padding-inline:20px}}
 .scrollLine{position:absolute;left:0;bottom:-1px;height:3px;width:100%;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,#c4823e,#e9b46a);z-index:5;pointer-events:none}
 .drift{will-change:transform}
 .loaf3d{position:relative;height:260px;margin:18px 0 4px;border-radius:20px;background:radial-gradient(60% 70% at 50% 60%,#f3e3c8,#efe2cc 55%,transparent 75%);touch-action:pan-y;cursor:grab}
@@ -239,6 +247,8 @@ details summary{cursor:pointer;color:#f1dfc2;min-height:32px}
 @media(min-width:960px){.bar{display:none}}
 .reveal{opacity:0;transform:translateY(22px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1)}.reveal.in{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal,.rise{opacity:1;transform:none}}
+/* reduce motion still gets soft fades (opacity is not movement): the films dissolve, captions and title fade without sliding */
+@media (prefers-reduced-motion:reduce){.hero .film{transition:opacity 1.2s ease!important}.cap,.heroText{transform:none!important;transition:opacity 1s ease!important}}
 </style>
 </head>
 <body>
@@ -409,7 +419,7 @@ details summary{cursor:pointer;color:#f1dfc2;min-height:32px}
       <div class="ovenFallback" aria-hidden="true"><span>Lighting the oven…</span></div>
       <div class="ovenUi"><span class="gmsg" id="gameMsg" role="status" aria-live="polite">Drag to turn the oven</span>
         <div class="gbottom"><div class="pchoices" id="pizzaPick" role="radiogroup" aria-label="Choose your pizza">
-          <button type="button" role="radio" aria-checked="true" data-p="margherita">Margherita</button><button type="button" role="radio" aria-checked="false" data-p="pepperoni">Pepperoni</button><button type="button" role="radio" aria-checked="false" data-p="veggie">Veggie</button><button type="button" role="radio" aria-checked="false" data-p="biltong">Biltong &amp; Feta</button></div>
+          <button type="button" role="radio" aria-checked="true" data-p="margherita">Margherita</button><button type="button" role="radio" aria-checked="false" data-p="veggie">Veggie</button><button type="button" role="radio" aria-checked="false" data-p="biltong">Biltong &amp; Feta</button></div>
         <div class="gbtns"><button class="btn stoke" id="gameBtn" type="button"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9.5" cy="9.5" r="6"/><path d="m13.8 13.8 6.7 6.7"/><circle cx="8" cy="8" r=".9" fill="currentColor"/><circle cx="11.5" cy="9" r=".9" fill="currentColor"/><circle cx="9" cy="11.7" r=".9" fill="currentColor"/></svg><span>Put in a pizza</span></button><button class="btn stoke2" id="stokeBtn" type="button"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-3.9 0-6.5-2.6-6.5-6.2 0-3.4 2.4-5.3 3.6-8.3.4 1.9 1.4 3 2.6 3.6C11.9 7 13 4.6 15.3 3c-.4 3.2 3.2 5.6 3.2 11.4 0 3.9-2.6 6.6-6.5 6.6z"/><path d="M12 21c-1.6 0-2.8-1.2-2.8-2.9 0-1.8 1.6-2.7 2.1-4.3 1.6 1 3.5 2.4 3.5 4.4 0 1.6-1.2 2.8-2.8 2.8z"/></svg><span>Stoke</span></button></div>
         <a id="gameCta" hidden class="btn btn-wa" href="https://wa.me/27712559726?text=Hi!%20Your%20website%20made%20me%20hungry%20%F0%9F%8D%95%20Please%20send%20me%20the%20pizza%20menu" target="_blank" rel="noopener">Hungry? Order a real one</a></div></div>
     </div>
@@ -423,7 +433,7 @@ details summary{cursor:pointer;color:#f1dfc2;min-height:32px}
       <span class="eyebrow">Baked with time · inspired by tradition</span>
       <h2 class="big">Flour, water, salt, and patience.</h2>
       <p class="lede">No commercial yeast and no shortcuts. Just a living starter and time, which gives you the crackling crust, the open crumb, the gentle tang, and bread that's easier to digest.</p>
-      <div class="loaf3d" id="loafWrap" role="img" aria-label="A 3D sourdough loaf on a floured board; drag to turn it"><span class="loafHint">Drag to turn the loaf</span></div>
+      <div class="loaf3d" id="loafWrap" data-glb="media/loaf.glb" role="img" aria-label="A 3D sourdough loaf on a floured board; drag to turn it"><span class="loafHint">Drag to turn the loaf</span></div>
       <div class="steps">
         <div><span><b>Feed the starter</b><span>Organic stone-ground flour and water: a wild-yeast culture we keep alive every day.</span></span></div>
         <div><span><b>Ferment slowly</b><span>Mixed, shaped and left to rise naturally over many hours.</span></span></div>
@@ -466,10 +476,12 @@ details summary{cursor:pointer;color:#f1dfc2;min-height:32px}
 
 <section>
   <div class="wrap">
-    <div class="reveal"><span class="eyebrow">What people say</span><h2 class="big">100% recommended</h2><p class="lede">From 9 reviews on Facebook.</p><div class="swipeHint" aria-hidden="true">Swipe <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></div>
+    <div class="reveal"><span class="eyebrow">What people say</span><h2 class="big">4.8 stars on Google</h2><p class="lede">From 69 Google reviews, and 100% recommended on Facebook.</p><div class="swipeHint" aria-hidden="true">Swipe <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></div>
     <div class="reviews">
-      <blockquote class="reveal"><div class="stars" aria-hidden="true">★★★★★</div><p>“The atmosphere and food is amazing. We will definitely go again and recommend them to everyone!!”</p><footer>Alicia Oberholster, on Facebook</footer></blockquote>
-      <blockquote class="reveal"><div class="stars" aria-hidden="true">★★★★★</div><p>“Regtig ’n oulike plekkie in Parys! Die suurdeegbrode is heerlik, die artisan-pizzas is fantasties…”</p><footer>Adriaan Johannes Meyer, on Facebook</footer></blockquote>
+      <blockquote class="reveal"><div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div><p>“Beautiful setting, friendly service, delicious food and the bread is to die for!”</p><footer>Monique v. D., on Google</footer></blockquote>
+      <blockquote class="reveal"><div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div><p>“Perfect setting to relax and enjoy. Dog friendly. Fresh sourdough was superb… All round great place and owner is an excellent host.”</p><footer>Howard F., on Google</footer></blockquote>
+      <blockquote class="reveal"><div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div><p>“Just a lovely place with great food. The bread is a must.”</p><footer>Serani A., on Google</footer></blockquote>
+      <blockquote class="reveal"><div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div><p>“Regtig ’n oulike plekkie in Parys! Die suurdeegbrode is heerlik, die artisan-pizzas is fantasties…”</p><footer>Adriaan M., on Facebook</footer></blockquote>
     </div>
   </div>
 </section>
@@ -536,7 +548,7 @@ details summary{cursor:pointer;color:#f1dfc2;min-height:32px}
     if(k===shown)return;shown=k;cap.classList.remove('on');
     if(k>=0){const c=list[k];setTimeout(()=>{if(shown!==k)return;cap.className='cap '+c[3];cap.innerHTML=c[2]+'<small>'+c[4]+'</small>';void cap.offsetWidth;cap.classList.add('on');},k===0?0:450);}};
   const show=i=>{clearTimeout(stillT);shown=-1;cap.classList.remove('on');
-    films.forEach((f,k)=>{f.classList.toggle('on',k===i);if(k!==i&&f.pause)f.pause();});
+    films.forEach((f,k)=>{f.classList.toggle('on',k===i);if(k!==i&&f.pause)setTimeout(()=>{if(cur!==k)f.pause();},1500);});
     chaps.forEach((c,k)=>{c.classList.toggle('on',k===i);c.querySelector('i').style.width='0';});
     heroText.classList.toggle('on',i===films.length-1);
     cur=i;const f=films[i];
@@ -544,10 +556,12 @@ details summary{cursor:pointer;color:#f1dfc2;min-height:32px}
     else{stillStart=performance.now();
       const tick=()=>{if(cur!==i)return;const p=Math.min(1,(performance.now()-stillStart)/STILL_MS);chaps[i].querySelector('i').style.width=p*100+'%';if(p<1)requestAnimationFrame(tick);};requestAnimationFrame(tick);}};
   films.forEach((f,k)=>{if(f.tagName!=='VIDEO')return;
+    f.addEventListener('playing',()=>{if(k===cur&&waiting){waiting=false;playBtn.classList.remove('show');}   // never show "play" over a playing film
+      const n=films[k+1];if(n&&!n.dataset.warm){n.dataset.warm=1;n.preload='auto';const q=n.play();if(q&&q.then)q.then(()=>{if(cur!==k+1){n.pause();n.currentTime=0;}}).catch(()=>{});}});
     f.addEventListener('ended',()=>{if(k===cur&&k<films.length-1)show(k+1);});   // the bread film ends on the cut loaf and stays there under the title
-    f.addEventListener('timeupdate',()=>{if(k!==cur||!f.duration)return;chaps[k].querySelector('i').style.width=(f.currentTime/f.duration*100)+'%';setCap(k,f.currentTime);});});
+    f.addEventListener('timeupdate',()=>{if(k!==cur||!f.duration)return;if(k<films.length-1&&f.duration-f.currentTime<1.2){show(k+1);return;}chaps[k].querySelector('i').style.width=(f.currentTime/f.duration*100)+'%';setCap(k,f.currentTime);});});
   // autoplay blocked: keep the first scene, show a play button; the first touch or click anywhere starts the film
-  const playBtn=document.getElementById('playFilm');let waiting=false;
+  var playBtn=document.getElementById('playFilm'),waiting=false;
   function blocked(){if(waiting)return;waiting=true;playBtn.classList.add('show');
     const go=()=>{if(!waiting)return;waiting=false;playBtn.classList.remove('show');removeEventListener('touchstart',go);removeEventListener('pointerdown',go);show(cur);};
     playBtn.onclick=go;addEventListener('touchstart',go,{once:true,passive:true});addEventListener('pointerdown',go,{once:true});}
@@ -561,7 +575,7 @@ details summary{cursor:pointer;color:#f1dfc2;min-height:32px}
    addEventListener('scroll',()=>{if(!tick){tick=true;requestAnimationFrame(upd);}},{passive:true});upd();}
   const loafMore=document.getElementById('loafMore');if(loafMore)loafMore.onclick=()=>{const l=document.getElementById('loafList'),open=l.classList.toggle('short')===false;
     loafMore.setAttribute('aria-expanded',open);loafMore.firstChild.textContent=open?'Show fewer ':'Show all 15 loaves ';loafMore.querySelector('svg').style.transform=open?'rotate(180deg)':'';};
-  if(matchMedia('(prefers-reduced-motion: reduce)').matches){films[0].classList.add('on');blocked();}else show(0);
+  show(0);
   // menu tabs (arrow keys move between them)
   const tabs=[...document.querySelectorAll('.tab')];
   const pick=t=>{tabs.forEach(x=>{const on=x===t;x.setAttribute('aria-selected',on);x.tabIndex=on?0:-1;document.getElementById(x.getAttribute('aria-controls')).hidden=!on;});};
@@ -773,6 +787,8 @@ async function build(){
     const ICO = { peel: "<svg class=\"ico\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"9.5\" cy=\"9.5\" r=\"6\"/><path d=\"m13.8 13.8 6.7 6.7\"/><circle cx=\"8\" cy=\"8\" r=\".9\" fill=\"currentColor\"/><circle cx=\"11.5\" cy=\"9\" r=\".9\" fill=\"currentColor\"/><circle cx=\"9\" cy=\"11.7\" r=\".9\" fill=\"currentColor\"/></svg>", bite: "<svg class=\"ico\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 6.5 12 21l8-14.5c-5-2.4-11-2.4-16 0z\"/><path d=\"M4.9 8.6c4.4-1.8 9.8-1.8 14.2 0\"/><circle cx=\"10\" cy=\"11.5\" r=\".9\" fill=\"currentColor\"/><circle cx=\"13.6\" cy=\"13\" r=\".9\" fill=\"currentColor\"/></svg>" };
     const say = (text, label, show = true) => { msg.textContent = text; btn.hidden = !show; if (!label) return;
       btn.innerHTML = ICO[/bite/i.test(label) ? 'bite' : 'peel']; const sp = document.createElement('span'); sp.textContent = label; btn.appendChild(sp); };
+    const stokeBtn = document.getElementById('stokeBtn');
+    const meter = k => { msg.style.setProperty('--bake', (k * 100).toFixed(1) + '%'); msg.classList.toggle('meter', k > 0); };
     const paint = () => {
       const k = Math.min(done, 1), b = Math.max(0, done - 1);
       crustMats.forEach(m => m.color.copy(RAW).lerp(DONE, k).lerp(BURNT, b));
@@ -780,11 +796,11 @@ async function build(){
       bakedMats.forEach(m => { m.opacity = k; m.color.setScalar(1 - b * .75); });   // the baked picture fades in; charring darkens it
       charMats.forEach(m => { m.opacity = Math.max(0, k * 1.4 - .4) + b * .3; });
     };
-    const reset = () => { state = 'idle'; done = 0; paint(); wedges.forEach(w => w.visible = true); gPeel.visible = true; gPeel.position.copy(OUT); cta.hidden = true; say('Drag to turn the oven', 'Put in a pizza'); };
+    const reset = () => { meter(0); state = 'idle'; done = 0; paint(); wedges.forEach(w => w.visible = true); gPeel.visible = true; gPeel.position.copy(OUT); cta.hidden = true; say('Drag to turn the oven', 'Put in a pizza'); };
     btn.onclick = () => {
-      const now = clock.getElapsedTime();
+      const now = clock.elapsedTime;
       if (state === 'idle') { state = 'in'; t0 = now; gPeel.visible = true; target = .12; say('Into the fire…', '', false); }
-      else if (state === 'baking' || state === 'ready' || state === 'burning') { state = 'out'; t0 = now; say('Out it comes…', '', false); }
+      else if (state === 'baking' || state === 'ready' || state === 'burning') { state = 'out'; t0 = now; meter(0); stokeBtn.classList.remove('nudge'); say('Out it comes…', '', false); }
       else if (state === 'served') { const left = wedges.filter(w => w.visible); if (left.length) left[0].visible = false;
         if (left.length <= 1) { state = 'eaten'; t0 = now; say(done > 1.4 ? 'Crunchy… next one stays in less long!' : 'Delicious. That\'s real sourdough pizza.', '', false); cta.hidden = false; }
         else say(done > 1.4 ? 'A bit charred, but still good…' : 'Mmm. ' + (left.length - 1) + ' slices to go', 'Take a bite'); }
@@ -794,11 +810,14 @@ async function build(){
       update(now, dt) {
         const e = now - t0;
         if (pick) pick.hidden = state !== 'idle';
-        if (state === 'in') { const k = Math.min(1, e / 1.3); gPeel.position.lerpVectors(OUT, IN, ease(k)); if (k >= 1) { state = 'baking'; t0 = now; boost = Math.max(boost, .6); } }
-        else if (state === 'baking') { done = Math.min(1, e / 5); paint(); const left = Math.ceil(5 - e);
-          if (e >= 5) { state = 'ready'; t0 = now; say('Ready! Take it out before it chars', 'Take it out!'); } else say('Baking… ' + left, '', false); }
-        else if (state === 'ready') { if (e > 3.5) { state = 'burning'; t0 = now; say('It\'s charring! Quick!', 'Take it out!'); } }
-        else if (state === 'burning') { done = Math.min(2, 1 + e / 4); paint(); }
+        if (state === 'in') { const k = Math.min(1, e / 1.3); gPeel.position.lerpVectors(OUT, IN, ease(k)); if (k >= 1) { state = 'baking'; t0 = now; say('Stoke the fire to cook your pizza', '', false); stokeBtn.classList.add('nudge'); } }
+        else if (state === 'baking' || state === 'ready' || state === 'burning') {
+          // heat comes from stoking (boost decays on its own); about six or seven stokes bake it, more starts to char it
+          done = Math.min(2, done + dt * (.025 + boost * .18) * (state === 'baking' ? 1 : .8)); paint();
+          meter(Math.min(1, done));
+          if (state === 'baking') { if (done >= 1) { state = 'ready'; say('Golden! Take it out before it chars', 'Take it out!'); stokeBtn.classList.remove('nudge'); }
+            else msg.textContent = done < .05 ? 'Stoke the fire to cook your pizza' : 'Cooking… ' + Math.round(done * 100) + '%'; }
+          else if (state === 'ready' && done > 1.25) { state = 'burning'; say('It\'s charring! Quick!', 'Take it out!'); } }
         else if (state === 'out') { const k = Math.min(1, e / 1.2); gPeel.position.lerpVectors(IN, OUT, ease(k)); if (k >= 1) { state = 'served'; say(done > 1.4 ? 'Hmm, well done indeed…' : 'Your ' + pick.querySelector('[aria-checked="true"]').textContent + ' is golden. Dig in!', 'Take a bite'); } }
         else if (state === 'eaten') { if (e > 6) reset(); }
       }
@@ -806,11 +825,11 @@ async function build(){
   })();
   // the "Stoke the fire" button
   function loop(){raf=0;if(!visible)return;raf=requestAnimationFrame(loop);
-    const t=clock.getElapsedTime(),dt=Math.min(clock.getDelta(),.05)||.016;
+    const dt=Math.min(clock.getDelta(),.05),t=clock.elapsedTime;   // delta first: getElapsedTime() would reset it
     if(!drag&&!reduce)target+=Math.sin(t*.25)*.0009;
     yaw+=(target-yaw)*.06;
     cam.position.set(Math.sin(yaw)*dist*Math.cos(pitch),1.2+dist*Math.sin(pitch),Math.cos(yaw)*dist*Math.cos(pitch));cam.lookAt(0,.15,0);
-    boost*=.985;const fl=(reduce?1:.85+Math.sin(t*9.1)*.08+Math.sin(t*23.7)*.05+Math.random()*.05)*(1+boost*1.3);
+    boost*=Math.pow(.985,dt*60);const fl=(reduce?1:.85+Math.sin(t*9.1)*.08+Math.sin(t*23.7)*.05+Math.random()*.05)*(1+boost*1.3);
     fireLight.intensity=14*fl;glow.intensity=2.2*fl;
     for(const s of flames){const u=s.userData;
       if(u.glow){const k=reduce?1:.85+Math.sin(t*5+u.ph)*.15,kb=k*(1+boost*.6);s.scale.set(u.sz*kb,u.sz*1.2*kb,1);s.position.y=.38+u.sz*.3*k;continue;}
@@ -828,9 +847,8 @@ async function build(){
 }
 </script>
 <script type="module">// A 3D sourdough boule on a floured board, in the "Flour, water, salt and patience" section.
-// It turns as you scroll past it and you can drag it round. Built from code (no model file):
-// a lumpy, flat-bottomed dome with one curved score that opens into an "ear", crust coloured per vertex
-// (dark-baked sides, flour dusting on top, golden inside the score). Renders only while on screen.
+// It turns as you scroll past it and you can drag it round. The loaf is a 3D model made from the bakery's own loaf photo
+// (Higgsfield sam_3_3d, work/web/loaf.glb), read by the small GLB reader below. Renders only while on screen.
 (() => {
 const wrap = document.getElementById('loafWrap');
 if (!wrap) return;
@@ -840,18 +858,33 @@ new IntersectionObserver(async (es, o) => { if (!es[0].isIntersecting || started
   try { await build(); } catch (e) { console.warn('3D loaf unavailable', e); wrap.classList.add('noGL'); }
 }, { rootMargin: '250px' }).observe(wrap);
 
-// small smooth 3D noise (hash + trilinear), enough for crust lumps and flour patches
-const hash = (x, y, z) => { const s = Math.sin(x * 127.1 + y * 311.7 + z * 74.7) * 43758.5453; return s - Math.floor(s); };
-const sm = t => t * t * (3 - 2 * t);
-function noise(x, y, z) {
-  const xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z), xf = sm(x - xi), yf = sm(y - yi), zf = sm(z - zi);
-  let r = 0;
-  for (let a = 0; a < 2; a++) for (let b = 0; b < 2; b++) for (let c = 0; c < 2; c++)
-    r += hash(xi + a, yi + b, zi + c) * (a ? xf : 1 - xf) * (b ? yf : 1 - yf) * (c ? zf : 1 - zf);
-  return r;
+
+// minimal GLB reader: positions, normals, uvs, indices and the base-colour image of the first mesh
+async function loadGLB(THREE, url) {
+  const buf = await (await fetch(url)).arrayBuffer(), dv = new DataView(buf);
+  if (dv.getUint32(0, true) !== 0x46546c67) throw new Error('not a GLB');
+  const jl = dv.getUint32(12, true), j = JSON.parse(new TextDecoder().decode(new Uint8Array(buf, 20, jl)));
+  const bin = 20 + jl + 8;
+  const view = i => { const v = j.bufferViews[i]; return new Uint8Array(buf, bin + (v.byteOffset || 0), v.byteLength); };
+  const acc = i => { const a = j.accessors[i], v = j.bufferViews[a.bufferView], n = { SCALAR: 1, VEC2: 2, VEC3: 3, VEC4: 4 }[a.type];
+    const T = { 5126: Float32Array, 5125: Uint32Array, 5123: Uint16Array, 5121: Uint8Array }[a.componentType];
+    const off = bin + (v.byteOffset || 0) + (a.byteOffset || 0), stride = v.byteStride || 0, es = n * T.BYTES_PER_ELEMENT;
+    if (!stride || stride === es) return new THREE.BufferAttribute(new T(buf.slice(off, off + a.count * es)), n);
+    const out = new T(a.count * n), src = new DataView(buf);   // interleaved: copy element by element
+    for (let e = 0; e < a.count; e++) for (let c = 0; c < n; c++) out[e * n + c] = T === Float32Array ? src.getFloat32(off + e * stride + c * 4, true) : src['getUint' + T.BYTES_PER_ELEMENT * 8](off + e * stride + c * T.BYTES_PER_ELEMENT, true);
+    return new THREE.BufferAttribute(out, n); };
+  const p = j.meshes[0].primitives[0], g = new THREE.BufferGeometry();
+  g.setAttribute('position', acc(p.attributes.POSITION));
+  if (p.attributes.TEXCOORD_0 !== undefined) g.setAttribute('uv', acc(p.attributes.TEXCOORD_0));
+  if (p.indices !== undefined) g.setIndex(acc(p.indices));   // index first: normals need the triangles
+  if (p.attributes.NORMAL !== undefined) g.setAttribute('normal', acc(p.attributes.NORMAL)); else g.computeVertexNormals();
+  const mat = new THREE.MeshStandardMaterial({ roughness: .9, metalness: 0 });
+  const ti = j.materials?.[p.material ?? 0]?.pbrMetallicRoughness?.baseColorTexture?.index;
+  if (ti !== undefined) { const im = j.images[j.textures[ti].source];
+    const bmp = await createImageBitmap(new Blob([view(im.bufferView)], { type: im.mimeType }), { imageOrientation: 'none' });
+    const t = new THREE.Texture(bmp); t.flipY = false; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; t.needsUpdate = true; mat.map = t; }
+  return new THREE.Mesh(g, mat);
 }
-const fbm = (x, y, z) => noise(x, y, z) * .55 + noise(x * 2.1, y * 2.1, z * 2.1) * .3 + noise(x * 4.3, y * 4.3, z * 4.3) * .15;
-console.assert(noise(.3, .4, .5) >= 0 && noise(.3, .4, .5) <= 1, 'noise in 0..1');
 
 async function build() {
   const THREE = await import(window.__THREE_URL__);
@@ -870,37 +903,13 @@ async function build() {
   key.shadow.mapSize.set(1024, 1024); Object.assign(key.shadow.camera, { left: -3, right: 3, top: 3, bottom: -3 }); key.shadow.bias = -.0008; scene.add(key);
   const rim = new THREE.DirectionalLight(0xffb070, 1.1); rim.position.set(3, 2, -4); scene.add(rim);
 
-  // ---- the loaf
-  const geo = new THREE.SphereGeometry(1, 128, 96);
-  const pos = geo.attributes.position, col = new Float32Array(pos.count * 3);
-  const CRUST_DARK = new THREE.Color(0x5a2f12), CRUST = new THREE.Color(0x9a5a26), CRUST_HI = new THREE.Color(0xc4823e);
-  const EAR = new THREE.Color(0xc78a48), EDGE = new THREE.Color(0x3a1c0a), FLOUR = new THREE.Color(0xf3eadb), c = new THREE.Color();
-  const v = new THREE.Vector3();
-  for (let i = 0; i < pos.count; i++) {
-    v.fromBufferAttribute(pos, i);
-    const ox = v.x, oy = v.y, oz = v.z;
-    // the score: a gentle S-curve across the top; distance from it decides groove (in) and ear (lifted lip on one side)
-    const curveZ = .22 * Math.sin(ox * 1.6) - .05, d = oz - curveZ, top = Math.max(0, oy);
-    const groove = Math.exp(-(d * d) / .006) * top, ear = Math.exp(-((d - .09) ** 2) / .004) * top;
-    const lump = (fbm(ox * 2.2 + 3, oy * 2.2, oz * 2.2) - .5) * .09;
-    let r = 1 + lump - groove * .2 + ear * .08;
-    let x = ox * r * 1.18, y = oy * r * .74, z = oz * r * 1.04;
-    if (y < -.12) y = -.12 - (y + .12) * .08;                     // flat base where it sat on the tray
-    y += .12;
-    pos.setXYZ(i, x, y, z);
-    // colour: dark lower sides, golden-brown body, flour dust on the crown (thinner near the score), bright opened crumb in the groove
-    const side = 1 - Math.min(1, Math.max(0, (oy + .2) / .9));
-    c.copy(CRUST).lerp(CRUST_HI, fbm(ox * 5, oy * 5, oz * 5) * .7).lerp(CRUST_DARK, side * .75 + ear * .5);
-    const dust = (Math.max(0, fbm(ox * 6.5 + 9, oy * 6.5, oz * 6.5) - .3) * 1.5 + Math.max(0, noise(ox * 40, oy * 40, oz * 40) - .55) * 1.2) * Math.pow(top, 1.6) * (1 - Math.min(1, groove * 2.5 + ear * 1.6));
-    c.lerp(FLOUR, Math.min(.78, dust));
-    c.lerp(CRUST_DARK, Math.max(0, noise(ox * 28 + 4, oy * 28, oz * 28) - .72) * 2.2);   // tiny dark blisters
-    const lip = Math.exp(-((d - .05) ** 2) / .0012) * top; c.lerp(EDGE, Math.min(.7, lip * 1.1));   // shadowed edge of the opened score
-    c.lerp(EAR, Math.min(.9, groove * 1.2));
-    col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
-  }
-  geo.setAttribute('color', new THREE.BufferAttribute(col, 3)); geo.computeVertexNormals();
-  const loaf = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .88, metalness: 0 }));
+  // ---- the loaf: their own loaf, as a textured 3D model
+  const loaf = await loadGLB(THREE, wrap.dataset.glb);
   loaf.castShadow = true; loaf.receiveShadow = true;
+  loaf.material.side = THREE.DoubleSide;   // the scan has small gaps around the score: draw both sides so nothing shows through
+  loaf.geometry.computeBoundingBox(); const bb = loaf.geometry.boundingBox, sz = bb.getSize(new THREE.Vector3());
+  const k = 2.3 / Math.max(sz.x, sz.z); loaf.scale.setScalar(k);
+  loaf.position.set(-(bb.min.x + sz.x / 2) * k, -bb.min.y * k, -(bb.min.z + sz.z / 2) * k);   // centred, sitting on the board
   const group = new THREE.Group(); group.add(loaf); scene.add(group);
 
   // ---- the board, with a little loose flour
